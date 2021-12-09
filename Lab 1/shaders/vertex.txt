@@ -1,0 +1,13 @@
+#version 450 core
+
+layout (location=0) in vec3 vertexPos;
+layout (location=1) in vec3 vertexColor;
+
+out vec3 fragmentColour;
+
+uniform mat4 trans;
+
+void main() {
+    gl_Position = trans * vec4(vertexPos, 1.0);
+    fragmentColour = vertexColor;
+}
