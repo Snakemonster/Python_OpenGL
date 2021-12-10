@@ -39,22 +39,10 @@ class App:
         while (running):
             # check events
             for event in pg.event.get():
-                if event.type == pg.QUIT:
+                if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                     running = False
                     break
-                if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_LEFT:
-                        model_transform = pyrr.matrix44.multiply(model_transform, pyrr.matrix44.create_from_translation(
-                            np.array([-0.25, 0, 0], dtype=np.float32)))
-                    if event.key == pg.K_RIGHT:
-                        model_transform = pyrr.matrix44.multiply(model_transform, pyrr.matrix44.create_from_translation(
-                            np.array([0.25, 0, 0], dtype=np.float32)))
-                    if event.key == pg.K_UP:
-                        model_transform = pyrr.matrix44.multiply(model_transform, pyrr.matrix44.create_from_translation(
-                            np.array([0, 0.25, 0], dtype=np.float32)))
-                    if event.key == pg.K_DOWN:
-                        model_transform = pyrr.matrix44.multiply(model_transform, pyrr.matrix44.create_from_translation(
-                            np.array([0, -0.25, 0], dtype=np.float32)))
+                model_transform = self.control(model_transform)
                 glUniformMatrix4fv(glGetUniformLocation(self.shader, "trans"), 1, GL_FALSE, model_transform)
 
             # refresh screen
@@ -67,6 +55,18 @@ class App:
             framerate = int(self.clock.get_fps())
             pg.display.set_caption(f"Running at {framerate} fps.")
         self.quit()
+
+    def control(self, transform):
+        keys = pg.key.get_pressed()
+        if keys[pg.K_a]:
+            return pyrr.matrix44.multiply(transform, pyrr.matrix44.create_from_translation(np.array([-0.05, 0, 0], dtype=np.float32)))
+        if keys[pg.K_d]:
+            return pyrr.matrix44.multiply(transform, pyrr.matrix44.create_from_translation(np.array([0.05, 0, 0], dtype=np.float32)))
+        if keys[pg.K_w]:
+            return pyrr.matrix44.multiply(transform, pyrr.matrix44.create_from_translation(np.array([0, 0.05, 0], dtype=np.float32)))
+        if keys[pg.K_s]:
+            return pyrr.matrix44.multiply(transform, pyrr.matrix44.create_from_translation(np.array([0, -0.05, 0], dtype=np.float32)))
+        return transform
 
     def quit(self):
         self.rabbit.destroy()
